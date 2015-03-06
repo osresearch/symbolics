@@ -10,28 +10,33 @@
 #define CLK_PIN		22
 #define DATA_PIN	23
 
+#define KEY(normal,shifted) \
+	(normal)
+
+	//((normal) | (shifted) << 8)
+
 static const uint16_t scancode[128] = {
 0, // 0
 0, // 1
-0, // 2 local
-0, // 3 caps
-0, // 4 left hyper
-0, // 5 left meta
-0, // 6 right control
+KEY_INSERT, // 2 local
+KEY_CAPS_LOCK, // 3 caps
+KEY_LEFT_GUI, // 4 left hyper
+KEY_LEFT_ALT, // 5 left meta
+KEY_RIGHT_CTRL, // 6 right control
 0, // 7 right super
-0, // 8 scroll
+KEY_F12, // 8 scroll
 0, // 9 mode lock
 0, // 10
 0, // 11
 0, // 12
-0, // 13 select
+KEY_F11, // 13 select
 0, // 14 left symbol
 0, // 15 left super
-0, // 16 left control
-0, // 17 space
-0, // 18 right meta
-0, // 19 right hyper
-0, // 20 end
+KEY_LEFT_CTRL, // 16 left control
+' ', // 17 space
+KEY_RIGHT_ALT, // 18 right meta
+KEY_RIGHT_GUI, // 19 right hyper
+KEY_RIGHT_ARROW, // 20 end
 0, // 21
 0, // 22
 0, // 23
@@ -40,13 +45,13 @@ static const uint16_t scancode[128] = {
 'b', // 26 b
 'm', // 27 m
 '.', // 28 .
-0, // 29 right shift
-0, // 30 repeat
-0, // 31 abort
+KEY_RIGHT_SHIFT, // 29 right shift
+KEY_F9, // 30 repeat
+KEY_F10, // 31 abort
 0, // 32
 0, // 33
 0, // 34
-0, // 35 left shift
+KEY_LEFT_SHIFT, // 35 left shift
 'x', // 36 x
 'v', // 37 v
 'n', // 38 n
@@ -63,7 +68,7 @@ static const uint16_t scancode[128] = {
 'h', // 49 h
 'k', // 50 k
 ';', // 51 ;
-0, // 52 return
+KEY_RETURN, // 52 return
 0, // 53 complete
 0, // 54
 0, // 55
@@ -75,29 +80,29 @@ static const uint16_t scancode[128] = {
 'j', // 61 j
 'l', // 62 l
 '\'', // 63 '
-0, // 64 line
+KEY_LEFT_ARROW, // 64 line
 0, // 65
 0, // 66
 0, // 67
-0, // 68 function
+KEY_F1, // 68 function
 'w', // 69 w
 'r', // 70 r
 'y', // 71 y
 'i', // 72 i
 'p', // 73 p
-0, // 74 ) ]
-0, // 75 page
+KEY(')',']'), // 74 ) ]
+KEY_PAGE_DOWN, // 75 page
 0, // 76
 0, // 77
 0, // 78
-'\t', // 79 tab
+KEY_TAB, // 79 tab
 'q', // 80 q
 'e', // 81 e
 't', // 82 t
 'u', // 83 u
 'o', // 84 o
-0, // 85 ( [
-0, // 86 bs
+KEY('(','['), // 85 ( [
+KEY_BACKSPACE, // 86 bs
 0, // 87
 0, // 88
 0, // 89
@@ -108,7 +113,7 @@ static const uint16_t scancode[128] = {
 '8', // 94 8
 '0', // 95 0
 '=', // 96 =
-0, // 97 \ {
+KEY('\\', '{'), // 97 \ {
 0, // 98
 0, // 99
 0, // 100
@@ -119,18 +124,18 @@ static const uint16_t scancode[128] = {
 '9', // 105 9
 '-', // 106 -
 '`', // 107 `
-0, // 108 | }
+KEY('|','}'), // 108 | }
 0, // 109
 0, // 110
 0, // 111
-0, // 112 escape
-0, // 113 refresh
-0, // 114 square
-0, // 115 circle
-0, // 116 triangle
-0, // 117 clear
-0, // 118 suspend
-0, // 119 resume
+KEY_ESC, // 112 escape
+KEY_F2, // 113 refresh
+KEY_F3, // 114 square
+KEY_F4, // 115 circle
+KEY_F5, // 116 triangle
+KEY_F6, // 117 clear
+KEY_F7, // 118 suspend
+KEY_F8, // 119 resume
 };
 
 void setup()
