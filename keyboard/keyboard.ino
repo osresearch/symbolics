@@ -24,8 +24,8 @@ KEY_LEFT_GUI, // 4 left hyper
 KEY_LEFT_ALT, // 5 left meta
 KEY_RIGHT_CTRL, // 6 right control
 0, // 7 right super
-KEY_F12, // 8 scroll
-0, // 9 mode lock
+KEY_SCROLL_LOCK, // 8 scroll
+KEY_NUM_LOCK, // 9 mode lock
 0, // 10
 0, // 11
 0, // 12
@@ -80,7 +80,7 @@ KEY_RETURN, // 52 return
 'j', // 61 j
 'l', // 62 l
 '\'', // 63 '
-KEY_LEFT_ARROW, // 64 line
+KEY_DOWN_ARROW, // 64 line
 0, // 65
 0, // 66
 0, // 67
