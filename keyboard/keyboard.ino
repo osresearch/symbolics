@@ -24,14 +24,25 @@ void loop()
 	delay(10);
 	digitalWrite(CLR_PIN, 1);
 
+	int count = 0;
+
 	for (uint8_t i = 0 ; i < 128 ; i++)
 	{
 		digitalWrite(CLK_PIN, 0);
 		//delay(1);
 		uint8_t bit = digitalRead(DATA_PIN);
 		digitalWrite(CLK_PIN, 1);
+/*
 		Serial.print(bit ? ' ' : '1');
+*/
+		if (!bit)
+		{
+			Serial.print(i);
+			Serial.print(' ');
+			count++;
+		}
 	}
 
-	Serial.println();
+	if (count)
+		Serial.println();
 }

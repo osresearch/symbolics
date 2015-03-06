@@ -1,0 +1,87 @@
+68 function
+112 escape
+113 refresh
+114 square
+115 circle
+116 triangle
+117 clear
+118 suspend
+119 resume
+31 abort
+57 network
+90 :
+101 1
+91 2
+102 3
+92 4
+103 5
+93 6
+104 7
+94 8
+105 9
+95 0
+106 -
+96 =
+107 `
+97 \ {
+108 | }
+2 local
+79 tab
+80 q
+69 w
+81 e
+70 r
+82 t
+71 y
+83 u
+72 i
+84 o
+73 p
+85 ( [
+74 ) ]
+86 bs
+75 page
+53 complete
+13 select
+46 rubout
+58 a
+47 s
+59 d
+48 f
+60 g
+49 h
+61 j
+50 k
+62 l
+51 ;
+63 '
+52 return
+64 line
+20 end
+3 caps
+14 left symbol
+35 left shift
+24 z
+36 x
+25 c
+37 v
+26 b
+38 n
+27 m
+39 ,
+28 .
+40 /
+29 right shift
+41 right symbol
+30 repeat
+9 mode lock
+4 left hyper
+15 left super
+5 left meta
+16 left control
+17 space
+6 right control
+18 right meta
+7 right super
+19 right hyper
+8 scroll
