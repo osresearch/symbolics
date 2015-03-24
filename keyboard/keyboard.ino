@@ -6,6 +6,8 @@
  * C7 Clr (Out)
  */
 
+#undef SERIAL_DEBUG
+
 #define CLR_PIN		10
 #define CLK_PIN		22
 #define DATA_PIN	23
@@ -15,27 +17,31 @@
 
 	//((normal) | (shifted) << 8)
 
+#define CONTROL_KEY 16
+#define HYPER_KEY 4
+#define FUNCTION_KEY 68
+
 static const uint16_t scancode[128] = {
 0, // 0
 0, // 1
 KEY_INSERT, // 2 local
 KEY_CAPS_LOCK, // 3 caps
-KEY_LEFT_GUI, // 4 left hyper
+0, // 4 left hyper -- used for control-alt-delete
 KEY_LEFT_ALT, // 5 left meta
 KEY_RIGHT_CTRL, // 6 right control
-0, // 7 right super
+KEY_LEFT_GUI, // 7 right super
 KEY_SCROLL_LOCK, // 8 scroll
 KEY_NUM_LOCK, // 9 mode lock
 0, // 10
 0, // 11
 0, // 12
 KEY_F11, // 13 select
-0, // 14 left symbol
-0, // 15 left super
+0, // 14 left symbol -- should figure something for this
+KEY_RIGHT_GUI, // 15 left super
 KEY_LEFT_CTRL, // 16 left control
 ' ', // 17 space
 KEY_RIGHT_ALT, // 18 right meta
-KEY_RIGHT_GUI, // 19 right hyper
+0, // 19 right hyper -- unused
 KEY_RIGHT_ARROW, // 20 end
 0, // 21
 0, // 22
@@ -84,7 +90,7 @@ KEY_DOWN_ARROW, // 64 line
 0, // 65
 0, // 66
 0, // 67
-KEY_F1, // 68 function
+0, // 68 function -- was F1, but turned off for now
 'w', // 69 w
 'r', // 70 r
 'y', // 71 y
@@ -140,7 +146,9 @@ KEY_F8, // 119 resume
 
 void setup()
 {
+#ifdef SERIAL_DEBUG
 	Serial.begin(38400);
+#endif
 	//Keyboard.begin();
 	pinMode(DATA_PIN, INPUT_PULLUP);
 	pinMode(CLR_PIN, OUTPUT);
@@ -149,6 +157,30 @@ void setup()
 
 static uint8_t press[128];
 
+static void
+control_alt_delete()
+{
+#ifdef SERIAL_DEBUG
+	Serial.println("control-alt-delete");
+#endif
+	// press and hold CTRL
+	Keyboard.set_modifier(MODIFIERKEY_CTRL);
+	Keyboard.send_now();
+
+	// press ALT while still holding CTRL
+	Keyboard.set_modifier(MODIFIERKEY_CTRL | MODIFIERKEY_ALT);
+	Keyboard.send_now();
+
+	// press DELETE, while CLTR and ALT still held
+	Keyboard.set_key1(KEY_DELETE);
+	Keyboard.send_now();
+
+	// release all the keys at the same instant
+	Keyboard.set_modifier(0);
+	Keyboard.set_key1(0);
+	Keyboard.send_now();
+}
+
 void loop()
 {
 	digitalWrite(CLR_PIN, 0);
@@ -156,6 +188,8 @@ void loop()
 	digitalWrite(CLR_PIN, 1);
 
 	int count = 0;
+	static int control_status;
+	static int hyper_status;
 
 	for (uint8_t i = 0 ; i < 128 ; i++)
 	{
@@ -165,17 +199,36 @@ void loop()
 		digitalWrite(CLK_PIN, 1);
 
 		const uint16_t s = scancode[i];
-		if (press[i] ^ bit == 0)
+		if ((press[i] ^ bit) == 0)
 			continue;
 
 		// state change!
 		press[i] = bit;
 
+		// on the symbolics the special sequence
+		// control - hyper - function was used to
+		// interrupt the front end process.
+		// it is now mapped to control-alt-delete.
+		if (i == CONTROL_KEY)
+			control_status = bit;
+		if (i == HYPER_KEY)
+			hyper_status = bit;
+		if (i == FUNCTION_KEY && bit)
+		{
+			Serial.print(control_status);
+			Serial.print(hyper_status);
+			Serial.println();
+			if (control_status && hyper_status)
+				control_alt_delete();
+		}
+
 		if (!s)
 		{
+#ifdef SERIAL_DEBUG
 			// an unknown/unhandled key
 			Serial.print(bit ? i : -i);
 			Serial.print(' ');
+#endif
 			count++;
 		} else
 		if (bit)
@@ -186,6 +239,8 @@ void loop()
 		}
 	}
 
+#ifdef SERIAL_DEBUG
 	if (count)
 		Serial.println();
+#endif
 }
