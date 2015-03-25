@@ -4,6 +4,11 @@
  * D4 Clk (Out)
  * D5 Data (In)
  * C7 Clr (Out)
+ *
+ * Some special cases: \{ and |} need to be correctly mapped.
+ * ([ and )]. 
+ *
+ * And the Control-Hyper-Function sequence for Ctrl-Alt-Delete.
  */
 
 #undef SERIAL_DEBUG
@@ -17,9 +22,16 @@
 
 	//((normal) | (shifted) << 8)
 
+#define LEFT_SHIFT_KEY 35
+#define RIGHT_SHIFT_KEY 29
 #define CONTROL_KEY 16
 #define HYPER_KEY 4
 #define FUNCTION_KEY 68
+
+#define SLASH_CURLY_KEY 97
+#define PIPE_CURLY_KEY 108
+#define OPEN_PAREN_KEY 85
+#define CLOSE_PAREN_KEY 74
 
 static const uint16_t scancode[128] = {
 0, // 0
@@ -181,6 +193,21 @@ control_alt_delete()
 	Keyboard.send_now();
 }
 
+
+static void
+keyboard_change(
+	int key,
+	int pressed
+)
+{
+	if (pressed)
+	{
+		Keyboard.press(key);
+	} else {
+		Keyboard.release(key);
+	}
+}
+
 void loop()
 {
 	digitalWrite(CLR_PIN, 0);
@@ -190,6 +217,7 @@ void loop()
 	int count = 0;
 	static int control_status;
 	static int hyper_status;
+	static int shift_status;
 
 	for (uint8_t i = 0 ; i < 128 ; i++)
 	{
@@ -198,12 +226,20 @@ void loop()
 		uint8_t bit = !digitalRead(DATA_PIN);
 		digitalWrite(CLK_PIN, 1);
 
-		const uint16_t s = scancode[i];
+		// s might be changed for a few special chars
+		uint16_t s = scancode[i];
+
 		if ((press[i] ^ bit) == 0)
 			continue;
 
 		// state change!
 		press[i] = bit;
+
+		// track both shift keys
+		if (i == LEFT_SHIFT_KEY)
+			shift_status = (shift_status & ~1) | (bit << 0);
+		if (i == RIGHT_SHIFT_KEY)
+			shift_status = (shift_status & ~2) | (bit << 1);
 
 		// on the symbolics the special sequence
 		// control - hyper - function was used to
@@ -220,7 +256,26 @@ void loop()
 			Serial.println();
 			if (control_status && hyper_status)
 				control_alt_delete();
+			continue;
 		}
+
+		// special case for some keys that have unusual mappings.
+		// There are extra () keys with shifted [] on them;
+		// these require that shift not be sent.
+		if (i == OPEN_PAREN_KEY && shift_status)
+		{
+			Keyboard.set_modifier(control_status ? MODIFIERKEY_CTRL : 0);
+			s = '[';
+		}
+		if (i == CLOSE_PAREN_KEY && shift_status)
+		{
+			Keyboard.set_modifier(control_status ? MODIFIERKEY_CTRL : 0);
+			s = ']';
+		}
+		if (i == SLASH_CURLY_KEY && shift_status)
+			s = '{';
+		if (i == PIPE_CURLY_KEY && shift_status)
+			s = '}';
 
 		if (!s)
 		{
@@ -231,12 +286,8 @@ void loop()
 #endif
 			count++;
 		} else
-		if (bit)
-		{
-			Keyboard.press(s);
-		} else {
-			Keyboard.release(s);
-		}
+
+		keyboard_change(s, bit);
 	}
 
 #ifdef SERIAL_DEBUG
