@@ -1,3 +1,3 @@
 # Symbolics USB keyboard interface
 
-More info: https://github.com/osresearch/symbolics
+More info: https://trmm.net/Symbolics
